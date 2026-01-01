@@ -16,7 +16,7 @@ export class ConfigWizard {
         console.log(chalk.cyan.bold('\n✨ codereviewer.ai Setup Wizard ✨'));
         console.log(chalk.gray('Let\'s configure your AI preferences.\n'));
 
-        const answers = await inquirer.prompt([
+        const initialAnswers = await inquirer.prompt([
             {
                 type: 'list',
                 name: 'provider',
@@ -33,7 +33,28 @@ export class ConfigWizard {
                 message: 'Enter your API Key:',
                 mask: '*',
                 validate: (input: string) => input.length > 0 || 'API Key is required.'
-            },
+            }
+        ]);
+
+        // Add model selection for Gemini
+        let modelAnswer = { model: 'gemini-2.0-flash-exp' };
+        if (initialAnswers.provider === 'gemini') {
+            modelAnswer = await inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'model',
+                    message: 'Select your preferred Gemini model:',
+                    choices: [
+                        { name: 'Gemini 2.0 Flash (Free tier, large context)', value: 'gemini-2.0-flash-exp' },
+                        { name: 'Gemini 2.0 Flash-Lite (Cost-effective, free)', value: 'gemini-2.0-flash-lite' },
+                        { name: 'Gemini 1.5 Pro (Stable, good performance)', value: 'gemini-1.5-pro' },
+                        { name: 'Gemini 1.5 Flash (Fast, good balance)', value: 'gemini-1.5-flash' }
+                    ]
+                }
+            ]);
+        }
+
+        const additionalAnswers = await inquirer.prompt([
             {
                 type: 'list',
                 name: 'reviewDepth',
@@ -54,8 +75,10 @@ export class ConfigWizard {
             }
         ]);
 
-        // Map models based on the provider chosen
-        let defaultModel = 'gemini-3-pro-preview';
+        const answers = { ...initialAnswers, ...modelAnswer, ...additionalAnswers };
+
+        // Map models based on the provider chosen (only for non-Gemini providers)
+        let defaultModel = answers.model || 'gemini-2.0-flash-exp';
         if (answers.provider === 'openai') defaultModel = 'gpt-4o';
         if (answers.provider === 'claude') defaultModel = 'claude-3-5-sonnet-20240620';
 

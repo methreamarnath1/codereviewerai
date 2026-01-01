@@ -6,6 +6,12 @@ import { ChatMessage } from '../core/context.js';
 export class AIProvider {
     private config: any;
     private genAI: GoogleGenAI | null = null;
+    private geminiFallbackModels = [
+        'gemini-2.0-flash-lite',
+        'gemini-1.5-flash',
+        'gemini-1.5-pro'
+    ];
+
 
     constructor(configManager: any) {
         this.config = configManager.getConfig();
@@ -89,12 +95,46 @@ export class AIProvider {
         if (!this.genAI) {
             throw new Error('Google GenAI not initialized. Check your API key.');
         }
-        const response = await this.genAI.models.generateContent({
-            model: this.config.model,
-            contents: prompt,
-        });
-        const text = response.text || '';
-        return JSON.parse(this.cleanJSON(text));
+
+        // Try the configured model first
+        try {
+            const response = await this.genAI.models.generateContent({
+                model: this.config.model,
+                contents: prompt,
+            });
+            const text = response.text || '';
+            return JSON.parse(this.cleanJSON(text));
+        } catch (error: any) {
+            // Check if it's a quota exceeded error
+            if (error.message?.includes('RESOURCE_EXHAUSTED') ||
+                error.message?.includes('Quota exceeded') ||
+                error.status === 429) {
+
+                console.log(chalk.yellow(`⚠️  ${this.config.model} quota exceeded. Trying fallback models...`));
+
+                // Try fallback models
+                for (const fallbackModel of this.geminiFallbackModels) {
+                    if (fallbackModel === this.config.model) continue; // Skip if it's the same model
+
+                    try {
+                        console.log(chalk.blue(`🔄 Trying ${fallbackModel}...`));
+                        const fallbackResponse = await this.genAI.models.generateContent({
+                            model: fallbackModel,
+                            contents: prompt,
+                        });
+                        const fallbackText = fallbackResponse.text || '';
+                        console.log(chalk.green(`✅ Successfully used ${fallbackModel}`));
+                        return JSON.parse(this.cleanJSON(fallbackText));
+                    } catch (fallbackError: any) {
+                        console.log(chalk.red(`❌ ${fallbackModel} also failed: ${fallbackError.message}`));
+                        continue;
+                    }
+                }
+
+                throw new Error(`All Gemini models failed. Last error: ${error.message}`);
+            }
+            throw error;
+        }
     }
 
     private async reviewWithOpenAI(prompt: string) {
@@ -127,12 +167,46 @@ export class AIProvider {
         if (!this.genAI) {
             throw new Error('Google GenAI not initialized. Check your API key.');
         }
+
         const prompt = this.buildChatPrompt(message, history);
-        const response = await this.genAI.models.generateContent({
-            model: this.config.model,
-            contents: prompt,
-        });
-        return response.text || '';
+
+        // Try the configured model first
+        try {
+            const response = await this.genAI.models.generateContent({
+                model: this.config.model,
+                contents: prompt,
+            });
+            return response.text || '';
+        } catch (error: any) {
+            // Check if it's a quota exceeded error
+            if (error.message?.includes('RESOURCE_EXHAUSTED') ||
+                error.message?.includes('Quota exceeded') ||
+                error.status === 429) {
+
+                console.log(chalk.yellow(`⚠️  ${this.config.model} quota exceeded. Trying fallback models...`));
+
+                // Try fallback models
+                for (const fallbackModel of this.geminiFallbackModels) {
+                    if (fallbackModel === this.config.model) continue; // Skip if it's the same model
+
+                    try {
+                        console.log(chalk.blue(`🔄 Trying ${fallbackModel}...`));
+                        const fallbackResponse = await this.genAI.models.generateContent({
+                            model: fallbackModel,
+                            contents: prompt,
+                        });
+                        console.log(chalk.green(`✅ Successfully used ${fallbackModel}`));
+                        return fallbackResponse.text || '';
+                    } catch (fallbackError: any) {
+                        console.log(chalk.red(`❌ ${fallbackModel} also failed: ${fallbackError.message}`));
+                        continue;
+                    }
+                }
+
+                throw new Error(`All Gemini models failed. Last error: ${error.message}`);
+            }
+            throw error;
+        }
     }
 
     private async chatWithOpenAI(message: string, history: ChatMessage[]): Promise<string> {
