@@ -1,12 +1,17 @@
 import axios from 'axios';
 import chalk from 'chalk';
+import { GoogleGenAI } from '@google/genai';
 import { ChatMessage } from '../core/context.js';
 
 export class AIProvider {
     private config: any;
+    private genAI: GoogleGenAI | null = null;
 
     constructor(configManager: any) {
         this.config = configManager.getConfig();
+        if (this.config.provider === 'gemini' && this.config.apiKey) {
+            this.genAI = new GoogleGenAI({ apiKey: this.config.apiKey });
+        }
     }
 
     /**
@@ -81,11 +86,14 @@ export class AIProvider {
     }
 
     private async reviewWithGemini(prompt: string) {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${this.config.apiKey}`;
-        const response = await axios.post(url, {
-            contents: [{ parts: [{ text: prompt }] }]
+        if (!this.genAI) {
+            throw new Error('Google GenAI not initialized. Check your API key.');
+        }
+        const response = await this.genAI.models.generateContent({
+            model: this.config.model,
+            contents: prompt,
         });
-        const text = response.data.candidates[0].content.parts[0].text;
+        const text = response.text || '';
         return JSON.parse(this.cleanJSON(text));
     }
 
@@ -116,12 +124,15 @@ export class AIProvider {
     }
 
     private async chatWithGemini(message: string, history: ChatMessage[]): Promise<string> {
+        if (!this.genAI) {
+            throw new Error('Google GenAI not initialized. Check your API key.');
+        }
         const prompt = this.buildChatPrompt(message, history);
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${this.config.apiKey}`;
-        const response = await axios.post(url, {
-            contents: [{ parts: [{ text: prompt }] }]
+        const response = await this.genAI.models.generateContent({
+            model: this.config.model,
+            contents: prompt,
         });
-        return response.data.candidates[0].content.parts[0].text;
+        return response.text || '';
     }
 
     private async chatWithOpenAI(message: string, history: ChatMessage[]): Promise<string> {

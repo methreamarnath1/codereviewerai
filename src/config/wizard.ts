@@ -55,7 +55,7 @@ export class ConfigWizard {
         ]);
 
         // Map models based on the provider chosen
-        let defaultModel = 'gemini-1.5-pro';
+        let defaultModel = 'gemini-3-pro-preview';
         if (answers.provider === 'openai') defaultModel = 'gpt-4o';
         if (answers.provider === 'claude') defaultModel = 'claude-3-5-sonnet-20240620';
 

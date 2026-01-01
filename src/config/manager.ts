@@ -26,7 +26,7 @@ export class ConfigManager {
             defaults: {
                 provider: 'gemini',
                 apiKey: '',
-                model: 'gemini-1.5-pro',
+                model: 'gemini-3-pro-preview',
                 reviewDepth: 'deep',
                 mode: 'manual',
                 includeContext: true,
