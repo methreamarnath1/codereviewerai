@@ -8,8 +8,6 @@ export class AIProvider {
     private genAI: GoogleGenAI | null = null;
     private geminiFallbackModels = [
         'gemini-2.0-flash-lite',
-        'gemini-1.5-flash',
-        'gemini-1.5-pro'
     ];
 
 
@@ -19,7 +17,7 @@ export class AIProvider {
             this.genAI = new GoogleGenAI({ apiKey: this.config.apiKey });
         }
     }
-
+ 
     /**
      * The main function to send code to the AI
      */
