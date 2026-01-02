@@ -20,7 +20,7 @@ export class AIProvider {
         }
     }
  
-    
+
     /**
      * The main function to send code to the AI
      */
@@ -46,7 +46,7 @@ export class AIProvider {
 
     /**
      * Chat with the AI using conversation history
-     */
+     */ 
     async chat(message: string, history: ChatMessage[]): Promise<string> {
         try {
             switch (this.config.provider) {
