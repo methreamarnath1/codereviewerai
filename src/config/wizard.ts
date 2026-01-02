@@ -46,12 +46,9 @@ export class ConfigWizard {
                     message: 'Select your preferred Gemini model:',
                     choices: [
                         { name: 'Gemini 2.5 Flash (Free tier, large context)', value: 'gemini-2.5-flash-lite' },
-                        { name: 'Gemini 2.0 Flash-Lite (Cost-effective, free)', value: 'gemini-2.0-flash-lite' },
-                        { name: 'Gemini 1.5 Pro (Stable, good performance)', value: 'gemini-1.5-pro' },
-                        { name: 'Gemini 1.5 Flash (Fast, good balance)', value: 'gemini-1.5-flash' }
                     ]
                 }
-            ]);
+            ]); 
         }
 
         const additionalAnswers = await inquirer.prompt([
