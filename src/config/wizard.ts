@@ -37,7 +37,7 @@ export class ConfigWizard {
         ]);
 
         // Add model selection for Gemini
-        let modelAnswer = { model: 'gemini-2.0-flash-exp' };
+        let modelAnswer = { model: 'gemini-2.5-flash-lite' };
         if (initialAnswers.provider === 'gemini') {
             modelAnswer = await inquirer.prompt([
                 {
@@ -45,7 +45,7 @@ export class ConfigWizard {
                     name: 'model',
                     message: 'Select your preferred Gemini model:',
                     choices: [
-                        { name: 'Gemini 2.0 Flash (Free tier, large context)', value: 'gemini-2.0-flash-exp' },
+                        { name: 'Gemini 2.5 Flash (Free tier, large context)', value: 'gemini-2.5-flash-lite' },
                         { name: 'Gemini 2.0 Flash-Lite (Cost-effective, free)', value: 'gemini-2.0-flash-lite' },
                         { name: 'Gemini 1.5 Pro (Stable, good performance)', value: 'gemini-1.5-pro' },
                         { name: 'Gemini 1.5 Flash (Fast, good balance)', value: 'gemini-1.5-flash' }
