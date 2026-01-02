@@ -35,6 +35,7 @@ export class AIProvider {
                 default:
                     throw new Error('No AI provider configured. Run "awd init"');
             }
+            
         } catch (error: any) {
             throw new Error(`AI Request Failed: ${error.response?.data?.error?.message || error.message}`);
         }

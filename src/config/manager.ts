@@ -26,7 +26,7 @@ export class ConfigManager {
             defaults: {
                 provider: 'gemini',
                 apiKey: '',
-                model: 'gemini-2.0-flash-exp',
+                model: 'gemini-2.5-flash-lite',
                 reviewDepth: 'deep',
                 mode: 'manual',
                 includeContext: true,
