@@ -1,6 +1,6 @@
 {
   "name": "codereviewerai",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "codereviewer.ai - AI-powered code review tool for developers",
   "type": "module",
   "main": "dist/index.js",
