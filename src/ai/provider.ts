@@ -7,7 +7,9 @@ export class AIProvider {
     private config: any;
     private genAI: GoogleGenAI | null = null;
     private geminiFallbackModels = [
+        'gemini-2.5-flash-lite',
         'gemini-2.0-flash-lite',
+        'gemini-1.5-flash',
     ];
 
 
@@ -35,7 +37,7 @@ export class AIProvider {
                 default:
                     throw new Error('No AI provider configured. Run "awd init"');
             }
-            
+
         } catch (error: any) {
             throw new Error(`AI Request Failed: ${error.response?.data?.error?.message || error.message}`);
         }
