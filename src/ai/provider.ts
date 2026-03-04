@@ -7,6 +7,7 @@ export class AIProvider {
     private config: any;
     private genAI: GoogleGenAI | null = null;
     private geminiFallbackModels = [
+        'gemini-3-flash-preview'
         'gemini-2.5-flash-lite',
         'gemini-2.0-flash-lite',
         'gemini-1.5-flash',
@@ -254,4 +255,5 @@ export class AIProvider {
     private cleanJSON(text: string): string {
         return text.replace(/```json|```/g, "").trim();
     }
+
 }
