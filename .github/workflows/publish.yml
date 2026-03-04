@@ -3,7 +3,7 @@ name: Publish Package
 on:
   push:
     tags:
-      - 'v*'   # triggers when you push version tags
+      - "v*"
 
 jobs:
   publish:
@@ -11,13 +11,13 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write   # REQUIRED for OIDC
+      id-token: write # REQUIRED for OIDC
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -26,5 +26,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Publish
-        run: npm publish
+      - name: Publish to npm
+        run: npm publish --provenance
